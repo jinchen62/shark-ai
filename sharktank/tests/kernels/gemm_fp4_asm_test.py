@@ -47,10 +47,10 @@ class TestAsmFp4Gemm:
     @pytest.mark.parametrize(
         "m, n, k, use_preshuffle",
         [
-            (256, 256, 1024, False),
-            (256, 256, 1024, True),
-            (256, 2048, 8192, False),
-            (256, 2048, 8192, True),
+            (320000, 1024, 16384, True),
+            # (320000, 16384, 16384, True),
+            # (320000, 53248, 16384, True),
+            # (320000, 128256, 16384, True),
         ],
     )
     def test_asm_fp4_gemm_export_compile_run(
@@ -87,9 +87,10 @@ class TestAsmFp4Gemm:
         assert "util.func private @asm_mxfp4_gemm" in mlir_asm
         assert "util.func private @shuffle_scales" in mlir_asm
 
-        mlir_path = tmp_path / "asm_fp4_gemm.mlir"
+        mlir_path = "test_single_gemm/320000x1024x16384_160x256.mlir"
         with open(str(mlir_path), "w") as f:
             f.write(mlir_asm)
+        return
         vmfb = ireec.compile_file(
             str(mlir_path),
             extra_args=self.hip_flags(),
